@@ -60,7 +60,7 @@ def default_config():
         "fallback_cwd": str(Path.home()),
         "archive_enabled": False,
         "archive_window_days": 14,
-        "archive_agents": ["codex", "claude", "opencode"],
+        "archive_agents": ["codex", "claude", "opencode", "omp"],
         "archive": {
             "codex": {
                 "sessions": [str(Path.home() / ".codex" / "sessions" / "**" / "*.jsonl")],
@@ -82,6 +82,13 @@ def default_config():
                 "resume": "opencode --session {session_id}",
                 "launcher": "agent",
                 "kind": "opencode",
+                "start_timeout_ms": 60000,
+            },
+            "omp": {
+                "sessions": [str(Path.home() / ".omp" / "agent" / "sessions" / "**" / "*.jsonl")],
+                "resume": "omp --resume {session_id}",
+                "launcher": "agent",
+                "kind": "omp",
                 "start_timeout_ms": 60000,
             },
         },
@@ -157,6 +164,8 @@ def app_config():
             cfg["archive"][agent]["start_timeout_ms"] = max(
                 1000, parser.getint(section, "start_timeout_ms")
             )
+        if parser.has_option(section, "enabled"):
+            cfg["archive"][agent]["enabled"] = parser.getboolean(section, "enabled")
         for key in ("database", "export"):
             if parser.has_option(section, key):
                 cfg["archive"][agent][key] = parser.get(section, key).strip()
@@ -178,6 +187,13 @@ def app_config():
             for key in ("database", "export"):
                 if parser.has_option(section, key):
                     cfg["archive"][agent][key] = parser.get(section, key).strip()
+            if parser.has_option(section, "enabled"):
+                cfg["archive"][agent]["enabled"] = parser.getboolean(section, "enabled")
+
+    cfg["archive_agents"] = [
+        agent for agent in cfg["archive_agents"]
+        if cfg["archive"].get(agent, {}).get("enabled", True)
+    ]
 
     if parser.has_section("skip"):
         labels = split_config_list(parser.get("skip", "pane_label_contains", fallback=""))

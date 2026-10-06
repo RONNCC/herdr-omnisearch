@@ -360,7 +360,7 @@ fallback_cwd = ~
 [archive]
 enabled = false
 window_days = 14
-agents = codex, claude, opencode
+agents = codex, claude, opencode, omp
 
 [archive.codex]
 sessions = ~/.codex/sessions/**/*.jsonl
@@ -383,6 +383,13 @@ start_timeout_ms = 60000
 resume = opencode --session {session_id}
 launcher = agent
 kind = opencode
+start_timeout_ms = 60000
+
+[archive.omp]
+sessions = ~/.omp/agent/sessions/**/*.jsonl
+resume = omp --resume {session_id}
+launcher = agent
+kind = omp
 start_timeout_ms = 60000
 
 [skip]
