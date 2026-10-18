@@ -393,6 +393,8 @@ def archive_file_metadata(agent: str, path: Path, thread_names):
     elif slug:
         title = slug.replace("-", " ")
     elif agent == "omp":
+        # omp saves sessions as <timestamp>_<id>.jsonl; strip the timestamp
+        # prefix when the id had to fall back to the filename stem.
         if "_" in session_id:
             session_id = session_id.split("_")[-1]
     started_epoch = archive_path_timestamp(agent, path)
